@@ -3,7 +3,6 @@ import pyxdameraulevenshtein as lev
 import numpy as np
 import time as t
 
-
 def single_fuzzmatch(w1: str, w2: str):
 
     fuz1 = fw.ratio(w1, w2)
@@ -38,10 +37,13 @@ def matrix_lev(words: list):
     return matrix, end-start
 
 
-def single_wombocombo(w1:str, w2:str):
+def single_wombocombo(w1: str, w2: str, dictionary):
     lev_d = single_lev(w1, w2)
     if lev_d == 0:
         return lev_d
+
+    if dictionary.get(w1.lower()) is not None and dictionary.get(w2.lower()) is not None and w1.lower() != w2.lower():
+        return lev_d + 20
 
     fuz1 = fw.ratio(w1, w2)
     fuz2 = fw.partial_ratio(w1, w2)
@@ -54,18 +56,18 @@ def single_wombocombo(w1:str, w2:str):
     fuzAverage = (fuz1 + fuz2 + fuz3)//3
     fuzsum = (fuz2 + fuz3) // 2
 
-    if (fuzAverage >= 80) or (fuzsum >= 85):
+    if (fuzAverage > 85) or (fuzsum >= 90):
         return 0
 
-    if (fuzAverage < 75) or (fuzsum < 65):
-        lev_d = lev_d + 10
+    if (fuzAverage < 75) or (fuzsum < 85):
+        lev_d = lev_d + 20
 
-    return lev_d
+    return lev_d + 5
 
 
-def wombo_combo(words: list):
+def wombo_combo(words: list, dictionary):
     start = t.time()
-    matrix = np.array([[single_wombocombo(w1, w2) for w1 in words] for w2 in words])
+    matrix = np.array([[single_wombocombo(w1, w2, dictionary) for w1 in words] for w2 in words])
     end = t.time()
     return matrix, end-start
 
@@ -76,13 +78,12 @@ def perfect_matching(words, dictionary):
     example: province = np.array([x.lower() if isinstance(x, str) else x for x in province])"""
 
     w = np.array([x.lower() if isinstance(x, str) else x for x in words])
-    d = np.array([x.lower() if isinstance(x, str) else x for x in dictionary])
 
     n_matching = 0
     i = 0
 
     for word in np.unique(w):
-        if word in d:
+        if dictionary.get(word) is not None:
             n_matching += 1
         i += 1
     return n_matching, i

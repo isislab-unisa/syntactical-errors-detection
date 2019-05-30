@@ -30,7 +30,7 @@ def kmeans(matrix, n_cluster: int, words: list):
 def agglomerative_propagation(matrix, n_cluster: int, words: list):
 
     start = t.time()
-    affinity = AC(affinity="precomputed", n_clusters=n_cluster, linkage="complete")
+    affinity = AC(affinity="precomputed", n_clusters=n_cluster, linkage="complete", compute_full_tree=True)
     affinity.fit(matrix)
 
     clusters = []
@@ -54,7 +54,7 @@ def find_samples(column: list, uniques, dictionary):
 
     for w in uniques:
         w = w.lower()
-        if w in dictionary:
+        if dictionary.get(w) is not None:
             return w
         count = column.count(w)
         if count > maxcount:
@@ -65,7 +65,6 @@ def find_samples(column: list, uniques, dictionary):
 
 def collapse(clusters, dictionary):
     samples = []
-    dictionary = [x.lower() for x in dictionary]
     for i, group in enumerate(clusters):
         samples.append(find_samples(group, np.unique(group), dictionary))
 
@@ -74,10 +73,10 @@ def collapse(clusters, dictionary):
             if i == j: continue
             w1 = w1.lower()
             w2 = w2.lower()
-            if w1 in dictionary and w2 in dictionary and w1 != w2:
+            if dictionary.get(w1) is not None and dictionary.get(w2) is not None and w1 != w2:
                 continue
-            if string_similarity.single_wombocombo(w1, w2) == 0:
-                print(w1, " e ", w2, " simili ma in cluster diversi")
+            if string_similarity.single_wombocombo(w1, w2, dictionary) == 0:
+                print(i, "-", w1, " e ", j, "-", w2, " simili ma in cluster diversi")
                 return False
 
 
@@ -93,13 +92,12 @@ def collapse(clusters, dictionary):
 def split(clusters, dictionary):
     flag = True
     present = ""
-    dictionary = [x.lower() for x in dictionary]
 
     for i, group in enumerate(clusters):
          g = np.unique(group)
          for w in g:
              w = w.lower()
-             if w in dictionary:
+             if dictionary.get(w) is not None:
                 if flag:
                     flag = False
                     present = w
@@ -121,3 +119,7 @@ def check_clusters(clusters, dictionary):
         return False, "Diminuire il n° di cluster"
 
     return True, "Numero esatto di cluster"
+
+
+def propose_correction(clusters, dictionary):
+    count_correction = 0

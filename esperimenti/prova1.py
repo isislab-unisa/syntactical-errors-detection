@@ -2,8 +2,8 @@ from fuzzywuzzy import fuzz as fw
 import distance
 import pyxdameraulevenshtein as levv
 
-w1 = "Umbria"
-w2 = "Umbriaaa"
+w1 = "castelluccio superiore"
+w2 = "castelluccio inferiore"
 
 lev = levv.damerau_levenshtein_distance(w1, w2)
 

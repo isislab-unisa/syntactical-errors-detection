@@ -40,13 +40,21 @@ def load_csv(csv_name, column, nrows=0):
 
 
 def load_regions():
-
-    data = pd.read_csv("elenco province.csv", error_bad_lines=False, sep=";", encoding="ISO-8859-1")
+    data = pd.read_csv("elenco comuni.csv", error_bad_lines=False, sep=";", encoding="ISO-8859-1")
     regions = np.unique(data["Regione"].to_numpy())
-    return regions
+    regions = np.array([x.lower() if isinstance(x, str) else x for x in regions])
+    return dict(zip(regions, regions))
 
 
 def load_province():
-    data = pd.read_csv("elenco province.csv", error_bad_lines=False, sep=";", encoding="ISO-8859-1")
+    data = pd.read_csv("elenco comuni.csv", error_bad_lines=False, sep=";", encoding="ISO-8859-1")
     province = np.unique(data["Provincia"].to_numpy())
-    return province
+    province = np.array([x.lower() if isinstance(x, str) else x for x in province])
+    return dict(zip(province, province))
+
+
+def load_comuni():
+    data = pd.read_csv("elenco comuni.csv", error_bad_lines=False, sep=";", encoding="windows-1252")
+    comuni = np.unique(data["Comune"].to_numpy())
+    comuni = np.array([x.lower() if isinstance(x, str) else x for x in comuni])
+    return dict(zip(comuni, comuni))

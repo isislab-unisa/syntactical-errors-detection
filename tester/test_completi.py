@@ -1,3 +1,5 @@
+from numpy import matrix
+
 from utilities import manage_data, mycluster, silhouette, string_similarity
 import numpy as np
 
@@ -20,7 +22,7 @@ def test_regioni_terremoti():
     esiti = []
     for i in n_cluster_silhouette:
         model, clusters, time = mycluster.agglomerative_propagation(matrix, i, words)
-        esiti.append(mycluster.check_clusters(clusters, regione))
+        esiti.append((mycluster.check_clusters(clusters, regione), i))
     return esiti
 
 def test_province_castelli():
@@ -34,3 +36,16 @@ def test_province_castelli():
         model, clusters, time = mycluster.agglomerative_propagation(matrix, i, words)
         esiti.append((mycluster.check_clusters(clusters, province), i))
     return esiti
+
+def test_comuni_terremoti():
+    comuni = manage_data.load_comuni()
+    words = manage_data.load_csv(csv_name="terremoti.csv", column="Comune")
+    matrix, time = string_similarity.wombo_combo(words, comuni)
+    n_cluster, total = string_similarity.perfect_matching(words, comuni)
+    n_cluster_silhouette = silhouette.silhouette_agglomerative(matrix, n_cluster, total)
+    esiti = []
+    for i in n_cluster_silhouette:
+        model, clusters, time = mycluster.agglomerative_propagation(matrix, i, words)
+        esiti.append((mycluster.check_clusters(clusters, comuni), i))
+    return esiti
+
