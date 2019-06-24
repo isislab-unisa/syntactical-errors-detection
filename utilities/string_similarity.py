@@ -74,17 +74,13 @@ def wombo_combo(words: list, dictionary):
 
 def perfect_matching(words, dictionary):
 
-    """ per garantire la correttezza del perfect matching, attuo una trasformazione dell'input
-    example: province = np.array([x.lower() if isinstance(x, str) else x for x in province])"""
-
     w = np.array([x.lower() if isinstance(x, str) else x for x in words])
 
     n_matching = 0
-    i = 0
 
     for word in np.unique(w):
         if dictionary.get(word) is not None:
             n_matching += 1
-        i += 1
-    return n_matching, i
+
+    return n_matching, len(np.unique(words))
 

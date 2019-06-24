@@ -46,6 +46,9 @@ def agglomerative():
     start = time.time()
 
     lev_similarity = np.array([[similarity(w1, w2) for w1 in words] for w2 in words])
+    n_cluster = int(input('Inserire numero di cluster\n'))
+    cluster = AC(affinity="precomputed", n_clusters=n_cluster, linkage="complete")
+    cluster.fit(lev_similarity)
 
     end = time.time()
 
@@ -53,8 +56,7 @@ def agglomerative():
 
     n_cluster = int(input('Inserire numero di cluser\n'))
 
-    cluster = AC(affinity="precomputed", n_clusters=n_cluster, linkage="complete")
-    cluster.fit(lev_similarity)
+#    cluster = AC(affinity="precomputed", n_clusters=n_cluster, linkage="complete")
 
     np.save("4000righe.npy", lev_similarity)
     print(lev_similarity)

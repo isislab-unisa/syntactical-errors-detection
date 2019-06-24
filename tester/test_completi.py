@@ -16,7 +16,7 @@ Tutti i vari test sui singoli dataset e sulle singole colonne seguono sempre lo 
 def test_regioni_terremoti():
     regione = manage_data.load_regions()
     words = manage_data.load_csv(csv_name="terremoti.csv", column="Regione")
-    matrix, time = string_similarity.wombo_combo(words)
+    matrix, time = string_similarity.wombo_combo(words, regione)
     n_cluster, total= string_similarity.perfect_matching(words, regione)
     n_cluster_silhouette = silhouette.silhouette_agglomerative(matrix, n_cluster, total)
     esiti = []
@@ -28,7 +28,7 @@ def test_regioni_terremoti():
 def test_province_castelli():
     province = manage_data.load_province()
     words = manage_data.load_csv(csv_name="castelli-e-torri-in-campania.csv", column="Provincia")
-    matrix, time = string_similarity.wombo_combo(words)
+    matrix, time = string_similarity.wombo_combo(words, province)
     n_cluster, total= string_similarity.perfect_matching(words, province)
     n_cluster_silhouette = silhouette.silhouette_agglomerative(matrix, n_cluster, total)
     esiti = []
