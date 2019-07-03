@@ -27,9 +27,9 @@ def save_matrix(filename: str, matrix):
 def load_csv(csv_name, column, nrows=0):
 
     if nrows == 0:
-        data = pd.read_csv(csv_name, error_bad_lines=False, sep=";", encoding="ISO-8859-1")
+        data = pd.read_csv(csv_name, error_bad_lines=False, sep=";", encoding="windows-1252")
     else:
-        data = pd.read_csv(csv_name, error_bad_lines=False, sep=";", nrows=nrows, encoding="ISO-8859-1")
+        data = pd.read_csv(csv_name, error_bad_lines=False, sep=";", nrows=nrows, encoding="windows-1252")
 
     words = data[column].to_numpy()
 

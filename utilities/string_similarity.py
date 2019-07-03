@@ -82,5 +82,7 @@ def perfect_matching(words, dictionary):
         if dictionary.get(word) is not None:
             n_matching += 1
 
+    if n_matching ==0:
+        n_matching = 1
     return n_matching, len(np.unique(words))
 

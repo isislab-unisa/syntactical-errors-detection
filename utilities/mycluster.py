@@ -106,6 +106,13 @@ def split(clusters, dictionary):
                     return False
          flag = True
 
+    for i, group in enumerate(clusters):
+        g = np.unique(group)
+        for w1 in g:
+            for w2 in g:
+                if string_similarity.single_wombocombo(w1.lower(), w2.lower(), dictionary) != 0:
+                    print(w1, "e", w2, "nello stesso cluster!!!")
+                    return False
 
 
     return flag
