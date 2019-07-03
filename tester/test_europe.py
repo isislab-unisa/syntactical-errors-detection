@@ -55,7 +55,7 @@ def francia_comuni_contributi():
     return esiti
 
 
-def francia_treni():
+def francia_trains():
     data = pd.read_csv("europa/francia/comuni francia.csv", error_bad_lines=False, sep=";", encoding="UTF-8")
     comuni = np.unique(data["Column6"].to_numpy())
     comuni = np.array([x.lower() if isinstance(x, str) else x for x in comuni])
@@ -106,6 +106,21 @@ def eire_counties():
     comuni = np.array([x.lower() if isinstance(x, str) else x for x in comuni])
     comuni = dict(zip(comuni, comuni))
     words = manage_data.load_csv(csv_name="europa/districts irlanda.csv", column="PROVINCE", nrows=2000)
+    matrix, time = string_similarity.wombo_combo(words, comuni)
+    n_cluster, total = string_similarity.perfect_matching(words, comuni)
+    esiti = []
+    for i in range(n_cluster, total + 1):
+        model, clusters, time = mycluster.agglomerative_propagation(matrix, i, words)
+        esiti.append((mycluster.check_clusters(clusters, comuni), i))
+    return esiti
+
+
+def holland_accidents():
+    data = pd.read_csv("europa/Olanda/olanda.csv", error_bad_lines=False, sep=";", encoding="windows-1252")
+    comuni = np.unique(data["Provincie"].to_numpy())
+    comuni = np.array([x.lower() if isinstance(x, str) else x for x in comuni])
+    comuni = dict(zip(comuni, comuni))
+    words = manage_data.load_csv(csv_name="europa/incidenti olanda.csv", column="PROVINCIE", nrows=2000)
     matrix, time = string_similarity.wombo_combo(words, comuni)
     n_cluster, total = string_similarity.perfect_matching(words, comuni)
     esiti = []
