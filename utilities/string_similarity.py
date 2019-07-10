@@ -3,6 +3,15 @@ import pyxdameraulevenshtein as lev
 import numpy as np
 import time as t
 
+_PESO_PARTIAL_RATIO = 1.1
+_HIGH_LEV_DIFFERENCE = 20
+_LOW_LEV_DIFFERENCE = 5
+_HIGH_AVERAGE_FUZZY = 85
+_LOW_AVERAGE_FUZZY = 75
+_HIGH_SUBSTRING_FUZZY = 90
+_LOW_SUBSTRING_FUZZY = 85
+
+
 def single_fuzzmatch(w1: str, w2: str):
 
     fuz1 = fw.ratio(w1, w2)
@@ -13,7 +22,7 @@ def single_fuzzmatch(w1: str, w2: str):
 # perchè molte città, anche diverse, hanno sottostringhe e token simili o uguali
 # ES: Nocera Superiore e Nocera Inferiore
 
-    fuzAverage = (fuz1 + fuz2*1.1 + fuz3)//3
+    fuzAverage = (fuz1 + fuz2*_PESO_PARTIAL_RATIO + fuz3)//3
     return -fuzAverage
 
 
@@ -43,7 +52,7 @@ def single_wombocombo(w1: str, w2: str, dictionary):
         return lev_d
 
     if dictionary.get(w1.lower()) is not None and dictionary.get(w2.lower()) is not None and w1.lower() != w2.lower():
-        return lev_d + 20
+        return lev_d + _HIGH_LEV_DIFFERENCE
 
     fuz1 = fw.ratio(w1, w2)
     fuz2 = fw.partial_ratio(w1, w2)
@@ -56,13 +65,13 @@ def single_wombocombo(w1: str, w2: str, dictionary):
     fuzAverage = (fuz1 + fuz2 + fuz3)//3
     fuzsum = (fuz2 + fuz3) // 2
 
-    if (fuzAverage > 85) or (fuzsum >= 90):
+    if (fuzAverage > _HIGH_AVERAGE_FUZZY) or (fuzsum >= _HIGH_SUBSTRING_FUZZY):
         return 0
 
-    if (fuzAverage < 75) or (fuzsum < 85):
-        lev_d = lev_d + 20
+    if (fuzAverage < _LOW_AVERAGE_FUZZY) or (fuzsum < _LOW_SUBSTRING_FUZZY):
+        lev_d = lev_d + _HIGH_LEV_DIFFERENCE
 
-    return lev_d + 5
+    return lev_d + _LOW_LEV_DIFFERENCE
 
 
 def wombo_combo(words: list, dictionary):
