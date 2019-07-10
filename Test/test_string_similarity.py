@@ -40,3 +40,12 @@ class TestStringSimilarity(unittest.TestCase):
 
         self.assertEqual(min, minres)
         self.assertEqual(max, maxres)
+
+    def test_single_fuzzy(self):
+        word1 = "Barack Obama"
+        word2 = "Barack H. Obama"
+
+        res = (-1)*string_similarity.single_fuzzmatch(word1, word2)
+
+        self.assertGreaterEqual(res, string_similarity.HIGH_AVERAGE_FUZZY)
+

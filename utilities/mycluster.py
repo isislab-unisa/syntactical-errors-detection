@@ -3,6 +3,7 @@ from sklearn.cluster import AgglomerativeClustering as AC
 import time as t
 import numpy as np
 
+
 from utilities import string_similarity
 
 
@@ -48,7 +49,7 @@ def agglomerative_propagation(matrix, n_cluster: int, words: list):
 
 
 def find_samples(column: list, uniques, dictionary):
-    maxcount=0
+    maxcount = 0
     maxw = ""
     column = [x.lower() for x in column]
 
@@ -63,7 +64,12 @@ def find_samples(column: list, uniques, dictionary):
     return maxw
 
 
-def collapse(clusters, dictionary):
+def collapse(clusters, dictionary,
+             high_average_fuzzy=string_similarity.HIGH_AVERAGE_FUZZY,
+             low_average_fuzzy=string_similarity.LOW_AVERAGE_FUZZY,
+             high_substring_fuzzy=string_similarity.HIGH_SUBSTRING_FUZZY,
+             low_substring_fuzzy=string_similarity.LOW_SUBSTRING_FUZZY,
+             lev_tollerance=string_similarity.LEV_TOLLERANCE):
     samples = []
     for i, group in enumerate(clusters):
         samples.append(find_samples(group, np.unique(group), dictionary))
@@ -75,7 +81,8 @@ def collapse(clusters, dictionary):
             w2 = w2.lower()
             if dictionary.get(w1) is not None and dictionary.get(w2) is not None and w1 != w2:
                 continue
-            if string_similarity.single_wombocombo(w1, w2, dictionary) == 0:
+            if string_similarity.single_wombocombo(w1, w2, dictionary, high_average_fuzzy, low_average_fuzzy,
+                                                   high_substring_fuzzy, low_substring_fuzzy, lev_tollerance) == 0:
                 print(i, "-", w1, " e ", j, "-", w2, " simili ma in cluster diversi")
                 return False
 
@@ -89,7 +96,13 @@ def collapse(clusters, dictionary):
 
 # controlla la coesistenza in un cluster di più elementi che hanno perfect matching nel dizionario
 # in definitiva verifica la necessità o meno di avere altre colonne
-def split(clusters, dictionary):
+def split(clusters, dictionary,
+          high_average_fuzzy=string_similarity.HIGH_AVERAGE_FUZZY,
+          low_average_fuzzy=string_similarity.LOW_AVERAGE_FUZZY,
+          high_substring_fuzzy=string_similarity.HIGH_SUBSTRING_FUZZY,
+          low_substring_fuzzy=string_similarity.LOW_SUBSTRING_FUZZY,
+          lev_tollerance=string_similarity.LEV_TOLLERANCE
+          ):
     flag = True
     present = ""
 
@@ -110,7 +123,10 @@ def split(clusters, dictionary):
         g = np.unique(group)
         for w1 in g:
             for w2 in g:
-                if string_similarity.single_wombocombo(w1.lower(), w2.lower(), dictionary) != 0:
+                if string_similarity.single_wombocombo(w1.lower(), w2.lower(), dictionary,
+                                                       high_average_fuzzy, low_average_fuzzy,
+                                                       high_substring_fuzzy, low_substring_fuzzy,
+                                                       lev_tollerance) != 0:
                     print(w1, "e", w2, "nello stesso cluster!!!")
                     return False
 
@@ -118,15 +134,36 @@ def split(clusters, dictionary):
     return flag
 
 
-def check_clusters(clusters, dictionary):
-    if not split(clusters, dictionary):
+def check_clusters(clusters, dictionary, high_average_fuzzy=string_similarity.HIGH_AVERAGE_FUZZY,
+                   low_average_fuzzy=string_similarity.LOW_AVERAGE_FUZZY,
+                   high_substring_fuzzy=string_similarity.HIGH_SUBSTRING_FUZZY,
+                   low_substring_fuzzy=string_similarity.LOW_SUBSTRING_FUZZY,
+                   lev_tollerance=string_similarity.LEV_TOLLERANCE):
+
+    if not split(clusters, dictionary, high_average_fuzzy, low_average_fuzzy, high_substring_fuzzy, low_substring_fuzzy, lev_tollerance):
         return False, "Aumentare il n° di cluster"
 
-    if not collapse(clusters, dictionary):
+    if not collapse(clusters, dictionary, high_average_fuzzy, low_average_fuzzy, high_substring_fuzzy, low_substring_fuzzy, lev_tollerance):
         return False, "Diminuire il n° di cluster"
 
     return True, "Numero esatto di cluster"
 
 
 def propose_correction(clusters, dictionary):
-    count_correction = 0
+
+    sample_flag = False
+    for i, group in enumerate(clusters):
+        g = np.unique(group)
+        for w in g:
+            if dictionary.get(w.lower()) is not None:
+                sample_flag = True
+                sample = w
+                break
+
+        if sample_flag:
+            clusters[:][i] = w
+
+        sample_flag = False
+
+    return clusters
+

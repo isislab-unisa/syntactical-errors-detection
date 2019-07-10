@@ -3,14 +3,14 @@ import pyxdameraulevenshtein as lev
 import numpy as np
 import time as t
 
-_PESO_PARTIAL_RATIO = 1.1
-_HIGH_LEV_DIFFERENCE = 20
-_LOW_LEV_DIFFERENCE = 5
-_HIGH_AVERAGE_FUZZY = 85
-_LOW_AVERAGE_FUZZY = 75
-_HIGH_SUBSTRING_FUZZY = 90
-_LOW_SUBSTRING_FUZZY = 85
-
+PESO_PARTIAL_RATIO = 1.0
+HIGH_LEV_DIFFERENCE = 20
+LOW_LEV_DIFFERENCE = 5
+HIGH_AVERAGE_FUZZY = 85
+LOW_AVERAGE_FUZZY = 75
+HIGH_SUBSTRING_FUZZY = 90
+LOW_SUBSTRING_FUZZY = 85
+LEV_TOLLERANCE = 0
 
 def single_fuzzmatch(w1: str, w2: str):
 
@@ -22,7 +22,7 @@ def single_fuzzmatch(w1: str, w2: str):
 # perchè molte città, anche diverse, hanno sottostringhe e token simili o uguali
 # ES: Nocera Superiore e Nocera Inferiore
 
-    fuzAverage = (fuz1 + fuz2*_PESO_PARTIAL_RATIO + fuz3)//3
+    fuzAverage = (fuz1 + fuz2 * PESO_PARTIAL_RATIO + fuz3) // 3
     return -fuzAverage
 
 
@@ -46,13 +46,18 @@ def matrix_lev(words: list):
     return matrix, end-start
 
 
-def single_wombocombo(w1: str, w2: str, dictionary):
+def single_wombocombo(w1: str, w2: str, dictionary, high_average_fuzzy=HIGH_AVERAGE_FUZZY,
+                      low_average_fuzzy=LOW_AVERAGE_FUZZY,
+                      high_substring_fuzzy=HIGH_SUBSTRING_FUZZY,
+                      low_substring_fuzzy=LOW_SUBSTRING_FUZZY,
+                      lev_tollerance=LEV_TOLLERANCE):
     lev_d = single_lev(w1, w2)
-    if lev_d == 0:
-        return lev_d
 
     if dictionary.get(w1.lower()) is not None and dictionary.get(w2.lower()) is not None and w1.lower() != w2.lower():
-        return lev_d + _HIGH_LEV_DIFFERENCE
+        return lev_d + HIGH_LEV_DIFFERENCE
+
+    if lev_d <= lev_tollerance:
+        return 0
 
     fuz1 = fw.ratio(w1, w2)
     fuz2 = fw.partial_ratio(w1, w2)
@@ -62,21 +67,25 @@ def single_wombocombo(w1: str, w2: str, dictionary):
 # perchè molte città, anche diverse, hanno sottostringhe e token simili o uguali
 # ES: Nocera Superiore e Nocera Inferiore
 
-    fuzAverage = (fuz1 + fuz2 + fuz3)//3
+    fuzAverage = (fuz1 + fuz2*1.1 + fuz3)//3
     fuzsum = (fuz2 + fuz3) // 2
 
-    if (fuzAverage > _HIGH_AVERAGE_FUZZY) or (fuzsum >= _HIGH_SUBSTRING_FUZZY):
+    if (fuzAverage >= high_average_fuzzy) or (fuzsum >= high_substring_fuzzy):
         return 0
 
-    if (fuzAverage < _LOW_AVERAGE_FUZZY) or (fuzsum < _LOW_SUBSTRING_FUZZY):
-        lev_d = lev_d + _HIGH_LEV_DIFFERENCE
+    if (fuzAverage < low_average_fuzzy) or (fuzsum < low_substring_fuzzy):
+        lev_d = lev_d + HIGH_LEV_DIFFERENCE
 
-    return lev_d + _LOW_LEV_DIFFERENCE
+    return lev_d + LOW_LEV_DIFFERENCE
 
 
-def wombo_combo(words: list, dictionary):
+def wombo_combo(words: list, dictionary, high_average_fuzzy=HIGH_AVERAGE_FUZZY,
+                low_average_fuzzy=LOW_AVERAGE_FUZZY, high_substring_fuzzy=HIGH_SUBSTRING_FUZZY,
+                low_substring_fuzzy=LOW_SUBSTRING_FUZZY,
+                lev_tollerance=LEV_TOLLERANCE):
     start = t.time()
-    matrix = np.array([[single_wombocombo(w1, w2, dictionary) for w1 in words] for w2 in words])
+    matrix = np.array([[single_wombocombo(w1, w2, dictionary, high_average_fuzzy, low_average_fuzzy,
+                                          high_substring_fuzzy, low_substring_fuzzy, lev_tollerance) for w1 in words] for w2 in words])
     end = t.time()
     return matrix, end-start
 

@@ -24,12 +24,12 @@ def save_matrix(filename: str, matrix):
     np.save(filename, matrix)
 
 
-def load_csv(csv_name, column, nrows=0):
+def load_csv(csv_name, column, nrows=0, encoding="windows-1252"):
 
     if nrows == 0:
-        data = pd.read_csv(csv_name, error_bad_lines=False, sep=";", encoding="windows-1252")
+        data = pd.read_csv(csv_name, error_bad_lines=False, sep=";", encoding=encoding)
     else:
-        data = pd.read_csv(csv_name, error_bad_lines=False, sep=";", nrows=nrows, encoding="windows-1252")
+        data = pd.read_csv(csv_name, error_bad_lines=False, sep=";", nrows=nrows, encoding=encoding)
 
     words = data[column].to_numpy()
 
@@ -54,7 +54,7 @@ def load_province():
 
 
 def load_comuni():
-    data = pd.read_csv("elenco comuni.csv", error_bad_lines=False, sep=";", encoding="windows-1252")
+    data = pd.read_csv("elenco comuni.csv", error_bad_lines=False, sep=";", encoding="ISO-8859-1")
     comuni = np.unique(data["Comune"].to_numpy())
     comuni = np.array([x.lower() if isinstance(x, str) else x for x in comuni])
     return dict(zip(comuni, comuni))
