@@ -1,5 +1,6 @@
 from sklearn.cluster import KMeans
 from sklearn.cluster import AgglomerativeClustering as AC
+from itertools import product
 import time as t
 import numpy as np
 
@@ -163,11 +164,11 @@ def propose_correction(clusters, dictionary):
                 break
 
         if not sample_flag:
-            for w in g:
-                for d in dictionary:
-                    if string_similarity.single_wombocombo(w, d, dictionary) == 0:
-                        sample = d
-                        sample_flag = True
+            for w, d in product(g, dictionary):
+                if string_similarity.single_wombocombo(w, d, dictionary) == 0:
+                    sample = d
+                    sample_flag = True
+                    break
 
         if sample_flag:
             for j, el in enumerate(group):

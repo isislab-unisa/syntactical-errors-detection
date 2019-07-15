@@ -2,6 +2,7 @@ import pandas as pd
 import tabulate
 import numpy as np
 
+DEFAULT_ENCODING = "windows-1252"
 
 def show_clusters(cluster):
     cluster_set = {}
@@ -24,7 +25,7 @@ def save_matrix(filename: str, matrix):
     np.save(filename, matrix)
 
 
-def load_csv(csv_name, column, nrows=0, encoding="windows-1252"):
+def load_csv(csv_name, column, nrows=0, encoding=DEFAULT_ENCODING):
 
     if nrows == 0:
         data = pd.read_csv(csv_name, error_bad_lines=False, sep=";", encoding=encoding)
@@ -39,22 +40,25 @@ def load_csv(csv_name, column, nrows=0, encoding="windows-1252"):
     return words
 
 
-def load_regions(path="elenco comuni.csv"):
+def load_regions(path="elenco province.csv"):
     data = pd.read_csv(path, error_bad_lines=False, sep=";", encoding="ISO-8859-1")
     regions = np.unique(data["Regione"].to_numpy())
-    regions = np.array([x.lower() if isinstance(x, str) else x for x in regions])
-    return dict(zip(regions, regions))
+    key = np.array([x.lower() if isinstance(x, str) else x for x in regions])
+    value =  np.array(regions)
+    return dict(zip(key, value))
 
 
-def load_province(path="elenco comuni.csv"):
+def load_province(path="elenco province.csv"):
     data = pd.read_csv(path, error_bad_lines=False, sep=";", encoding="ISO-8859-1")
     province = np.unique(data["Provincia"].to_numpy())
-    province = np.array([x.lower() if isinstance(x, str) else x for x in province])
-    return dict(zip(province, province))
+    key = np.array([x.lower() if isinstance(x, str) else x for x in province])
+    value = np.array(province)
+    return dict(zip(key, value))
 
 
 def load_comuni(path="elenco comuni.csv"):
     data = pd.read_csv(path, error_bad_lines=False, sep=";", encoding="ISO-8859-1")
     comuni = np.unique(data["Comune"].to_numpy())
-    comuni = np.array([x.lower() if isinstance(x, str) else x for x in comuni])
-    return dict(zip(comuni, comuni))
+    key = np.array([x.lower() if isinstance(x, str) else x for x in comuni])
+    value = np.array(comuni)
+    return dict(zip(key, value))
