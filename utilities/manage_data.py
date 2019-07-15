@@ -39,22 +39,22 @@ def load_csv(csv_name, column, nrows=0, encoding="windows-1252"):
     return words
 
 
-def load_regions():
-    data = pd.read_csv("elenco comuni.csv", error_bad_lines=False, sep=";", encoding="ISO-8859-1")
+def load_regions(path="elenco comuni.csv"):
+    data = pd.read_csv(path, error_bad_lines=False, sep=";", encoding="ISO-8859-1")
     regions = np.unique(data["Regione"].to_numpy())
     regions = np.array([x.lower() if isinstance(x, str) else x for x in regions])
     return dict(zip(regions, regions))
 
 
-def load_province():
-    data = pd.read_csv("elenco comuni.csv", error_bad_lines=False, sep=";", encoding="ISO-8859-1")
+def load_province(path="elenco comuni.csv"):
+    data = pd.read_csv(path, error_bad_lines=False, sep=";", encoding="ISO-8859-1")
     province = np.unique(data["Provincia"].to_numpy())
     province = np.array([x.lower() if isinstance(x, str) else x for x in province])
     return dict(zip(province, province))
 
 
-def load_comuni():
-    data = pd.read_csv("elenco comuni.csv", error_bad_lines=False, sep=";", encoding="ISO-8859-1")
+def load_comuni(path="elenco comuni.csv"):
+    data = pd.read_csv(path, error_bad_lines=False, sep=";", encoding="ISO-8859-1")
     comuni = np.unique(data["Comune"].to_numpy())
     comuni = np.array([x.lower() if isinstance(x, str) else x for x in comuni])
     return dict(zip(comuni, comuni))

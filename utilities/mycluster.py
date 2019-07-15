@@ -151,19 +151,30 @@ def check_clusters(clusters, dictionary, high_average_fuzzy=string_similarity.HI
 
 def propose_correction(clusters, dictionary):
 
+    sample = ""
     sample_flag = False
     for i, group in enumerate(clusters):
         g = np.unique(group)
         for w in g:
             if dictionary.get(w.lower()) is not None:
+
                 sample_flag = True
                 sample = w
                 break
 
+        if not sample_flag:
+            for w in g:
+                for d in dictionary:
+                    if string_similarity.single_wombocombo(w, d, dictionary) == 0:
+                        sample = d
+                        sample_flag = True
+
         if sample_flag:
-            clusters[:][i] = w
+            for j, el in enumerate(group):
+                clusters[i][j] = str(sample)
 
         sample_flag = False
+        sample = ""
 
     return clusters
 
