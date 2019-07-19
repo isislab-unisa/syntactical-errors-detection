@@ -15,7 +15,7 @@ def show_clusters(cluster):
     data = data.replace(np.nan, '', regex=True)
 
     print("\ndimensioni: ", data.shape, "\n\n", tabulate.tabulate(data, headers="keys", tablefmt="orgtbl"))
-
+    return data.shape
 
 def load_matrix(filename: str):
     return np.load(filename)

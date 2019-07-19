@@ -166,7 +166,7 @@ def propose_correction(clusters, dictionary):
         if not sample_flag:
             for w, d in product(g, dictionary):
                 if string_similarity.single_wombocombo(w, d, dictionary) == 0:
-                    sample = d
+                    sample = dictionary.get(d)
                     sample_flag = True
                     break
 
