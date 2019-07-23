@@ -2,6 +2,9 @@ import unittest
 from utilities import manage_data, mycluster, string_similarity
 import numpy as np
 
+
+#testing clustering controllando i due vettori degli indici
+
 class TestMyCluster(unittest.TestCase):
 
     def test_find_samples(self):
@@ -22,12 +25,16 @@ class TestMyCluster(unittest.TestCase):
         province = manage_data.load_province("../elenco comuni.csv")
 
         clusters = [["Saler", "Saler", "Salern", "Salerr", "alerno", "Salerno"],
-                 ["Napoli", "Napoli", "Napol", "Napo", "Napoli"],
-                 ["Milan", "Milan", "Milan", "Milan"]]
+                    ["Napoli", "Napoli", "Napol", "Napo", "Napoli"],
+                    ["Milan", "Milan", "Milan", "Milan"],
+                    ["Salerno", "Milan", "Salern", "Milano", "Milan"],
+                    ["Salern", "Milan", "Salern", "Milan", "Milan"]]
 
         res = [["Salerno", "Salerno", "Salerno", "Salerno", "Salerno", "Salerno"],
-                 ["Napoli", "Napoli", "Napoli", "Napoli", "Napoli"],
-                 ["Milano", "Milano", "Milano", "Milano"]]
+               ["Napoli", "Napoli", "Napoli", "Napoli", "Napoli"],
+               ["Milano", "Milano", "Milano", "Milano"],
+               ["Salerno", "Milano", "Salerno", "Milano", "Milano"],
+               ["Salerno", "Milano", "Salerno", "Milano", "Milano"]]
 
         correction = mycluster.propose_correction(clusters, province)
 

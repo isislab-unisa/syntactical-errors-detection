@@ -150,19 +150,30 @@ def check_clusters(clusters, dictionary, high_average_fuzzy=string_similarity.HI
     return True, "Numero esatto di cluster"
 
 
+#fare versione gerenale, nel caso in cui ci sono 2 parole nel dizionario che corrispondono
 def propose_correction(clusters, dictionary):
 
     sample = ""
+    samples = []
     sample_flag = False
+    more_solutions = False
     for i, group in enumerate(clusters):
         g = np.unique(group)
+
+#Ricerca di uno o più termini presenti nel dizionario
         for w in g:
             if dictionary.get(w.lower()) is not None:
+                if not sample_flag:
+                    sample_flag = True
+                    sample = w
+                    samples.append(w)
 
-                sample_flag = True
-                sample = w
-                break
+                else:
+                    samples.append(w)
+                    more_solutions = True
+                    break
 
+#Caso 1: Nessun elemento del cluster fa parte del dizionario
         if not sample_flag:
             for w, d in product(g, dictionary):
                 if string_similarity.single_wombocombo(w, d, dictionary) == 0:
@@ -170,12 +181,21 @@ def propose_correction(clusters, dictionary):
                     sample_flag = True
                     break
 
+#Caso2: Uno o più elementi del dizionario
         if sample_flag:
-            for j, el in enumerate(group):
-                clusters[i][j] = str(sample)
+            if not more_solutions:
+                for j, el in enumerate(group):
+                    clusters[i][j] = str(sample)
+            else:
+                for j, el in enumerate(group):
+                    for s in samples:
+                        if string_similarity.single_wombocombo(s, el, dictionary) == 0:
+                            clusters[i][j] = str(s)
 
         sample_flag = False
+        more_solutions = False
         sample = ""
+        samples = []
 
     return clusters
 
