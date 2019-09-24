@@ -2,8 +2,8 @@ from fuzzywuzzy import fuzz as fw
 import distance
 import pyxdameraulevenshtein as levv
 
-w1 = "Monster"
-w2 = "Munsters"
+w1 = "Castelbaronia"
+w2 = "CastelBaronia"
 
 lev = levv.damerau_levenshtein_distance(w1, w2)
 
@@ -24,6 +24,6 @@ print("token", fuz3)
 print(fuzAverage)
 print("fuzsums", (fuz2+fuz3)/2)
 
-if (fuzAverage >= 80) or ((fuz2 + fuz3)/2 >= 85):
+if (fuzAverage >= 100) or ((fuz2 + fuz3)/2 >= 100):
     print("Simili ")
 

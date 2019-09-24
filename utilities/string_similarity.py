@@ -3,16 +3,19 @@ import pyxdameraulevenshtein as lev
 import numpy as np
 import time as t
 
-PESO_PARTIAL_RATIO = 1.0
+PESO_PARTIAL_RATIO = 1.2
 HIGH_LEV_DIFFERENCE = 20
 LOW_LEV_DIFFERENCE = 5
-HIGH_AVERAGE_FUZZY = 80
-LOW_AVERAGE_FUZZY = 70
+HIGH_AVERAGE_FUZZY = 85
+LOW_AVERAGE_FUZZY = 75
 HIGH_SUBSTRING_FUZZY = 85
 LOW_SUBSTRING_FUZZY = 75
-LEV_TOLLERANCE = 0
+LEV_TOLLERANCE = 1
 
 def single_fuzzmatch(w1: str, w2: str):
+
+    w1 = w1.lower()
+    w2 = w2.lower()
 
     fuz1 = fw.ratio(w1, w2)
     fuz2 = fw.partial_ratio(w1, w2)
@@ -22,8 +25,8 @@ def single_fuzzmatch(w1: str, w2: str):
 # perchè molte città, anche diverse, hanno sottostringhe e token simili o uguali
 # ES: Nocera Superiore e Nocera Inferiore
 
-    fuzAverage = (fuz1 + fuz2 * PESO_PARTIAL_RATIO + fuz3) // 3
-    return -fuzAverage
+    fuzAverage = (fuz1 + fuz2 + fuz3) // 3
+    return fuzAverage
 
 
 def single_lev(w1: str, w2: str):
@@ -46,14 +49,18 @@ def matrix_lev(words: list):
     return matrix, end-start
 
 
-def single_wombocombo(w1: str, w2: str, dictionary, high_average_fuzzy=HIGH_AVERAGE_FUZZY,
+def single_wombocombo(w1: str, w2: str, dictionary,
+                      high_average_fuzzy=HIGH_AVERAGE_FUZZY,
                       low_average_fuzzy=LOW_AVERAGE_FUZZY,
                       high_substring_fuzzy=HIGH_SUBSTRING_FUZZY,
                       low_substring_fuzzy=LOW_SUBSTRING_FUZZY,
                       lev_tollerance=LEV_TOLLERANCE):
+    w1 = w1.lower().strip()
+    w2 = w2.lower().strip()
+
     lev_d = single_lev(w1, w2)
 
-    if dictionary.get(w1.lower()) is not None and dictionary.get(w2.lower()) is not None and w1.lower() != w2.lower():
+    if dictionary.get(w1.lower()) is not None and dictionary.get(w2) is not None and w1 != w2:
         return lev_d + HIGH_LEV_DIFFERENCE
 
     if lev_d <= lev_tollerance:
@@ -67,13 +74,13 @@ def single_wombocombo(w1: str, w2: str, dictionary, high_average_fuzzy=HIGH_AVER
 # perchè molte città, anche diverse, hanno sottostringhe e token simili o uguali
 # ES: Nocera Superiore e Nocera Inferiore
 
-    fuzAverage = (fuz1 + fuz2*1.1 + fuz3)//3
-    fuzsum = (fuz2 + fuz3) // 2
+    fuzAverage = (fuz1 + (fuz2*PESO_PARTIAL_RATIO) + fuz3)//3
+#    fuzsum = (fuz2 + fuz3) // 2
 
-    if (fuzAverage >= high_average_fuzzy) or (fuzsum >= high_substring_fuzzy):
+    if (fuzAverage >= high_average_fuzzy):# or (fuzsum >= high_substring_fuzzy):
         return 0
 
-    if (fuzAverage < low_average_fuzzy) or (fuzsum < low_substring_fuzzy):
+    if (fuzAverage < low_average_fuzzy):# or (fuzsum < low_substring_fuzzy):
         lev_d = lev_d + HIGH_LEV_DIFFERENCE
 
     return lev_d + LOW_LEV_DIFFERENCE
@@ -86,6 +93,7 @@ def wombo_combo(words: list, dictionary, high_average_fuzzy=HIGH_AVERAGE_FUZZY,
     start = t.time()
     matrix = np.array([[single_wombocombo(w1, w2, dictionary, high_average_fuzzy, low_average_fuzzy,
                                           high_substring_fuzzy, low_substring_fuzzy, lev_tollerance) for w1 in words] for w2 in words])
+
     end = t.time()
     return matrix, end-start
 

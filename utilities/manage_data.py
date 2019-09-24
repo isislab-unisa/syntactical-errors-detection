@@ -7,8 +7,10 @@ DEFAULT_ENCODING = "windows-1252"
 def show_clusters(cluster):
     cluster_set = {}
     for cl in cluster:
+
         if len(cl)==0:
             continue
+        cl = np.unique(cl)
         # data[cl[0]] = pd.Series(cl[1:])
         cluster_set[cl[0]] = cl
     data = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in cluster_set.items()]))
@@ -23,6 +25,12 @@ def load_matrix(filename: str):
 
 def save_matrix(filename: str, matrix):
     np.save(filename, matrix)
+
+def rimuovi_provincia(provincia: str):
+    i = provincia.find("(")
+    if i != -1:
+        provincia = provincia[0:i:]
+    return provincia
 
 
 def load_csv(csv_name, column, nrows=0, encoding=DEFAULT_ENCODING):

@@ -34,7 +34,6 @@ def agglomerative_propagation(matrix, n_cluster: int, words: list):
     start = t.time()
     affinity = AC(affinity="precomputed", n_clusters=n_cluster, linkage="complete", compute_full_tree=True)
     affinity.fit(matrix)
-
     clusters = []
 
     for index in range(0, n_cluster):
@@ -43,7 +42,6 @@ def agglomerative_propagation(matrix, n_cluster: int, words: list):
 
     for index in range(0, len(words)):
         clusters[affinity.labels_[index]].append(words[index])
-
     end = t.time()
 
     return affinity, clusters, end-start
@@ -108,7 +106,7 @@ def split(clusters, dictionary,
     present = ""
 
     for i, group in enumerate(clusters):
-         g = np.unique(group)
+         g = np.unique([x.lower() for x in group])
          for w in g:
              w = w.lower()
              if dictionary.get(w) is not None:
@@ -121,7 +119,7 @@ def split(clusters, dictionary,
          flag = True
 
     for i, group in enumerate(clusters):
-        g = np.unique(group)
+        g = np.unique([x.lower() for x in group])
         for w1 in g:
             for w2 in g:
                 if string_similarity.single_wombocombo(w1.lower(), w2.lower(), dictionary,
@@ -151,12 +149,39 @@ def check_clusters(clusters, dictionary, high_average_fuzzy=string_similarity.HI
 
 
 #fare versione gerenale, nel caso in cui ci sono 2 parole nel dizionario che corrispondono
-def propose_correction(clusters, dictionary):
+def propose_correction_general(clusters, dictionary):
 
-    sample = ""
     samples = []
+    for i, group in enumerate(clusters):
+        g = np.unique(group)
+
+#Caso 1: Nessun elemento del cluster fa parte del dizionario
+
+        for w, d in product(g, dictionary):
+                if string_similarity.single_wombocombo(w, d, dictionary) == 0:
+                    samples.append(dictionary.get(d))
+
+
+#Caso2: Uno o più elementi del dizionario
+
+        print(group)
+        print(samples)
+        print("-----")
+        for j, el in enumerate(group):
+                for s in samples:
+                    if string_similarity.single_wombocombo(s, el, dictionary) == 0:
+                        clusters[i][j] = str(s)
+
+        samples = []
+
+    return clusters
+
+#fare versione gerenale, nel caso in cui ci sono 2 parole nel dizionario che corrispondono
+def propose_correction(clusters, dictionary):
+    start = t.time()
+    sample = ""
+    maxval = 0
     sample_flag = False
-    more_solutions = False
     for i, group in enumerate(clusters):
         g = np.unique(group)
 
@@ -166,36 +191,38 @@ def propose_correction(clusters, dictionary):
                 if not sample_flag:
                     sample_flag = True
                     sample = w
-                    samples.append(w)
-
-                else:
-                    samples.append(w)
-                    more_solutions = True
                     break
 
-#Caso 1: Nessun elemento del cluster fa parte del dizionario
+        #Caso 1: Nessun elemento del cluster fa parte del dizionario
         if not sample_flag:
             for w, d in product(g, dictionary):
                 if string_similarity.single_wombocombo(w, d, dictionary) == 0:
-                    sample = dictionary.get(d)
-                    sample_flag = True
-                    break
+                    val = string_similarity.single_fuzzmatch(w, d)
+                    val2 = string_similarity.single_fuzzmatch(w.replace(" ", ""), d.replace(" ", ""))
 
-#Caso2: Uno o più elementi del dizionario
+                    if(val < val2):
+                        val = val2
+
+                    if sample == "":
+                        sample = dictionary.get(d)
+                        maxval = val
+                    elif maxval < val:
+                        sample = dictionary.get(d)
+                        maxval = val
+
+                    sample_flag = True
+
+#applica la correzione a tutto il gruppo, se è stato individuato un esemplare nel dizionario
         if sample_flag:
-            if not more_solutions:
                 for j, el in enumerate(group):
+
+                    if clusters[i][j].lower().strip() != sample.lower().strip():
+
+                        print("Corretto", clusters[i][j], "con", sample)
                     clusters[i][j] = str(sample)
-            else:
-                for j, el in enumerate(group):
-                    for s in samples:
-                        if string_similarity.single_wombocombo(s, el, dictionary) == 0:
-                            clusters[i][j] = str(s)
 
         sample_flag = False
-        more_solutions = False
         sample = ""
-        samples = []
-
+    end = t.time() - start
+    print("Tempo 2", end)
     return clusters
-

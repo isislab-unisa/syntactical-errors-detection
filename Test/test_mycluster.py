@@ -21,13 +21,13 @@ class TestMyCluster(unittest.TestCase):
         self.assertEqual(res2.lower(), sample2.lower())
 
 
-    def test_propose_correction(self):
+    def test_propose_correction_general(self):
         province = manage_data.load_province("../elenco comuni.csv")
 
         clusters = [["Saler", "Saler", "Salern", "Salerr", "alerno", "Salerno"],
                     ["Napoli", "Napoli", "Napol", "Napo", "Napoli"],
                     ["Milan", "Milan", "Milan", "Milan"],
-                    ["Salerno", "Milan", "Salern", "Milano", "Milan"],
+                    ["Salerno", "Milan", "Salern", "Milan", "Milan"],
                     ["Salern", "Milan", "Salern", "Milan", "Milan"]]
 
         res = [["Salerno", "Salerno", "Salerno", "Salerno", "Salerno", "Salerno"],
@@ -36,11 +36,14 @@ class TestMyCluster(unittest.TestCase):
                ["Salerno", "Milano", "Salerno", "Milano", "Milano"],
                ["Salerno", "Milano", "Salerno", "Milano", "Milano"]]
 
-        correction = mycluster.propose_correction(clusters, province)
-
-        for i, cluster in enumerate(clusters):
+        correction = mycluster.propose_correction_general(clusters, province)
+        print(correction)
+        print("\n")
+        print(res)
+        for i, cluster in enumerate(res):
             for j, element in enumerate(cluster):
-                self.assertEqual(correction[i][j].lower(), res[i][j].lower())
+                print(correction[i][j].lower(), element.lower())
+                self.assertEqual(correction[i][j].lower(), element.lower())
 
     def test_collapse(self):
 

@@ -33,7 +33,7 @@ def francia_regioni_monumenti():
 
 def francia_comuni_contributi():
     data = pd.read_csv("europa/francia/comuni francia.csv", error_bad_lines=False, sep=";", encoding="UTF-8")
-    comuni = np.unique(data["Column4"].to_numpy())
+    comuni = np.unique(data["Column6"].to_numpy())
     comuni = np.array([x.lower() if isinstance(x, str) else x for x in comuni])
     comuni = dict(zip(comuni, comuni))
     words = manage_data.load_csv(csv_name="europa/contributi-francia-2017.csv", column="inom", nrows=1000)
@@ -77,7 +77,13 @@ def eng_school():
     comuni = np.unique(data["Town"].to_numpy())
     comuni = np.array([x.lower() if isinstance(x, str) else x for x in comuni])
     comuni = dict(zip(comuni, comuni))
-    words = manage_data.load_csv(csv_name="europa/uk1.csv", column="Column8", nrows=1000)
+    comuni2 = np.unique(data["County"].to_numpy())
+    comuni2 = np.array([x.lower() if isinstance(x, str) else x for x in comuni2])
+    comuni2 = dict(zip(comuni2, comuni2))
+
+    comuni.update(comuni2)
+
+    words = manage_data.load_csv(csv_name="europa/milk producer uk.csv", column="Address5", nrows=1000)
     matrix, time = string_similarity.wombo_combo(words, comuni)
     n_cluster, total = string_similarity.perfect_matching(words, comuni)
     esiti = []
