@@ -6,10 +6,10 @@ import time as t
 PESO_PARTIAL_RATIO = 1.2
 HIGH_LEV_DIFFERENCE = 20
 LOW_LEV_DIFFERENCE = 5
-HIGH_AVERAGE_FUZZY = 85
-LOW_AVERAGE_FUZZY = 75
-HIGH_SUBSTRING_FUZZY = 85
-LOW_SUBSTRING_FUZZY = 75
+HIGH_AVERAGE_FUZZY = 95
+LOW_AVERAGE_FUZZY = 85
+HIGH_SUBSTRING_FUZZY = 95
+LOW_SUBSTRING_FUZZY = 85
 LEV_TOLLERANCE = 1
 
 def single_fuzzmatch(w1: str, w2: str):
@@ -30,8 +30,8 @@ def single_fuzzmatch(w1: str, w2: str):
 
 
 def single_lev(w1: str, w2: str):
-    w1.lower()
-    w2.lower()
+    w1 = w1.lower().replace(" ", "")
+    w2 = w2.lower().replace(" ", "")
     return lev.damerau_levenshtein_distance(w1, w2)
 
 
@@ -75,12 +75,12 @@ def single_wombocombo(w1: str, w2: str, dictionary,
 # ES: Nocera Superiore e Nocera Inferiore
 
     fuzAverage = (fuz1 + (fuz2*PESO_PARTIAL_RATIO) + fuz3)//3
-#    fuzsum = (fuz2 + fuz3) // 2
+  #  fuzsum = (fuz2 + fuz3) // 2
 
-    if (fuzAverage >= high_average_fuzzy):# or (fuzsum >= high_substring_fuzzy):
+    if (fuzAverage >= high_average_fuzzy): #or (fuzsum >= high_substring_fuzzy):
         return 0
 
-    if (fuzAverage < low_average_fuzzy):# or (fuzsum < low_substring_fuzzy):
+    if (fuzAverage < low_average_fuzzy): # or (fuzsum < low_substring_fuzzy):
         lev_d = lev_d + HIGH_LEV_DIFFERENCE
 
     return lev_d + LOW_LEV_DIFFERENCE

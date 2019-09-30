@@ -188,20 +188,21 @@ def propose_correction(clusters, dictionary):
 #Ricerca di uno o più termini presenti nel dizionario
         for w in g:
             if dictionary.get(w.lower()) is not None:
-                if not sample_flag:
-                    sample_flag = True
-                    sample = w
-                    break
+                sample_flag = True
+                sample = w
+                break
 
         #Caso 1: Nessun elemento del cluster fa parte del dizionario
         if not sample_flag:
             for w, d in product(g, dictionary):
                 if string_similarity.single_wombocombo(w, d, dictionary) == 0:
-                    val = string_similarity.single_fuzzmatch(w, d)
-                    val2 = string_similarity.single_fuzzmatch(w.replace(" ", ""), d.replace(" ", ""))
 
-                    if(val < val2):
-                        val = val2
+                    val = string_similarity.single_lev(w, d)
+
+                    if (val >1):
+                        val = string_similarity.single_fuzzmatch(w, d)
+                    else:
+                        val = 100
 
                     if sample == "":
                         sample = dictionary.get(d)

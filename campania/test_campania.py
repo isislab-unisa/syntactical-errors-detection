@@ -1,6 +1,4 @@
 from utilities import manage_data, mycluster, string_similarity
-import pandas as pd
-import numpy as np
 import time as t
 comuni = manage_data.load_comuni()
 
@@ -83,7 +81,6 @@ def elenco_comunita_minori():
 
 def elenco_parafarmacie():
     end = t.time()
-
     words = manage_data.load_csv(csv_name="campania/Elenco-Parafarmacie.csv", column="DESCRIZIONECOMUNE", encoding="UTF-8")
     matrix, time = string_similarity.wombo_combo(words, comuni)
     n_cluster, total = string_similarity.perfect_matching(words, comuni)
@@ -96,12 +93,15 @@ def elenco_parafarmacie():
     print("Tempo 1: ", end)
     return esiti
 
+
 def elenco_enti_spettacolo():
     end = t.time()
 
     words = manage_data.load_csv(csv_name="campania/Elenco_enti_Spettacolo_e_Cinema.csv", column="SedeLegale", encoding="UTF-8")
     for i, w in enumerate(words):
         words[i] = manage_data.rimuovi_provincia(w)
+
+    comuni = manage_data.load_comuni()
 
     matrix, time = string_similarity.wombo_combo(words, comuni)
     n_cluster, total = string_similarity.perfect_matching(words, comuni)
@@ -112,7 +112,19 @@ def elenco_enti_spettacolo():
 
     end = t.time() - end
     print("Tempo 1: ", end)
-    return esiti
+
+    for tuple in esiti:
+        t2= tuple[0]
+        result = t2[0]
+        if result:
+            n = tuple[1]
+            break;
+
+    if result:
+        model, clusters, time = mycluster.agglomerative_propagation(matrix, i, words)
+        return mycluster.propose_correction(clusters, comuni)
+    else:
+        print("Error, impossible to detect and correct errors")
 
 def fattorie_didattiche():
     end = t.time()
@@ -128,7 +140,19 @@ def fattorie_didattiche():
 
     end = t.time() - end
     print("Tempo 1: ", end)
-    return esiti
+
+    for tuple in esiti:
+        t2= tuple[0]
+        result = t2[0]
+        if result:
+            n = tuple[1]
+            break;
+
+    if result:
+        model, clusters, time = mycluster.agglomerative_propagation(matrix, i, words)
+        return mycluster.propose_correction(clusters, comuni)
+    else:
+        print("Error, impossible to detect and correct errors")
 
 def immobili():
     end = t.time()
@@ -317,5 +341,17 @@ def territorio():
     end = t.time() - end
     print("Tempo 1: ", end)
 
-    return esiti
+
+    for tuple in esiti:
+        t2= tuple[0]
+        result = t2[0]
+        if result:
+            n = tuple[1]
+            break;
+
+    if result:
+        model, clusters, time = mycluster.agglomerative_propagation(matrix, i, words)
+        return mycluster.propose_correction(clusters, comuni)
+    else:
+        print("Error, impossible to detect and correct errors")
 
